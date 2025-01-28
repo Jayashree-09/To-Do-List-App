@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced To-Do List</title>
+    <style>
+        /* General reset and styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url(./download.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            /* background: linear-gradient(135deg, #6a11cb, #2575fc); */
+            color: #fff;
+        }
+
+        /* Main container */
+        .container {
+            /* background: #ffffff; */
+             /* background-color: #e0a800; */
+             background: linear-gradient(135deg, #00feba, #5b548a);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Input section */
+        .task-input {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .task-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 20px 0 0 20px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .task-input button {
+            /* background: #6a11cb; */
+            background-color: #c82333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0 20px 20px 0;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .task-input button:hover {
+            background: #2575fc;
+        }
+
+        /* Task list styling */
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-item {
+            background: #f4f4f9;
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item input[type="text"] {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            outline: none;
+            color: #333;
+        }
+
+        .task-item button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background:forestgreen;
+            color: #333;
+        }
+
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+
+        .delete-btn {
+           background: #c82333;
+            color: #fff;
+        }
+
+        .delete-btn:hover {
+            /* background: #c82333; */
+           background: peru;
+
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .task-input input {
+                font-size: 0.9rem;
+            }
+
+            .task-item input[type="text"] {
+                font-size: 0.9rem;
+            }
+
+            .task-item button {
+                font-size: 0.8rem;
+            }
+
+            /* Move the buttons slightly to the left on mobile */
+            .task-item {
+                justify-content: flex-start; /* Keep the task item left-aligned */
+            }
+
+            .task-item button {
+                margin-left: 10px; /* Move buttons slightly to the left */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My To-Do List</h1>
+        <!-- Input for adding tasks -->
+        <div class="task-input">
+            <input type="text" id="taskInput" placeholder="Enter a new task...">
+            <button id="addTaskBtn">Add</button>
+        </div>
+        <!-- Task list -->
+        <ul class="task-list" id="taskList"></ul>
+    </div>
+
+    <script>
+        // Select input, button, and task list
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskList = document.getElementById('taskList');
+
+        // Function to create a new task
+        function createTaskElement(taskText) {
+            const taskItem = document.createElement('li');
+            taskItem.className = 'task-item';
+
+            // Input field for the task text
+            const taskInputField = document.createElement('input');
+            taskInputField.type = 'text';
+            taskInputField.value = taskText;
+            taskInputField.disabled = true;
+
+            // Edit button
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = 'Edit';
+
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+
+            // Edit functionality
+            editBtn.addEventListener('click', () => {
+                if (taskInputField.disabled) {
+                    taskInputField.disabled = false;
+                    editBtn.textContent = 'Save';
+                } else {
+                    taskInputField.disabled = true;
+                    editBtn.textContent = 'Edit';
+                }
+            });
+
+            // Delete functionality
+            deleteBtn.addEventListener('click', () => {
+                taskList.removeChild(taskItem);
+            });
+
+            // Append input field and buttons to the task item
+            taskItem.appendChild(taskInputField);
+            taskItem.appendChild(editBtn);
+            taskItem.appendChild(deleteBtn);
+
+            return taskItem;
+        }
+
+        // Add task when clicking the Add button
+        addTaskBtn.addEventListener('click', () => {
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                const taskElement = createTaskElement(taskText);
+                taskList.appendChild(taskElement);
+                taskInput.value = ''; // Clear the input field
+            }
+        });
+    </script>
+</body>
+</html>
