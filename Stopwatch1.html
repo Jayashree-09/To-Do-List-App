@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flip-Card Stopwatch with Laps & Themes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background: linear-gradient(135deg, #00feba, #5b548a);
+            color: white;
+        }
+        .container {
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            background: brown
+        }
+        .stopwatch-container {
+            display: inline-block;
+            perspective: 1000px;
+            margin: 20px 0;
+        }
+        .flip-card {
+            width: 200px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        .side {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+        .front { background: #333; color: white; }
+        .back { background: #ff5733; color: white; transform: rotateY(180deg); }
+        .buttons, .theme-switcher {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .start-btn { background-color: #28a745; color: white; }
+        .stop-btn { background-color: #dc3545; color: white; }
+        .reset-btn { background-color: #ffc107; color: black; }
+        .lap-btn { background-color: #007bff; color: white; }
+        .theme-btn { background-color: #6c757d; color: white; }
+        button:hover { opacity: 0.8; }
+        .laps { margin-top: 20px; text-align: left; }
+        .laps li { background: white; color: black; padding: 5px; margin: 5px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stopwatch Application</h1>
+        <div class="stopwatch-container">
+            <div class="flip-card" id="flipCard">
+                <div class="side front" id="timeFront">00:00:00</div>
+                <div class="side back" id="timeBack">00:00:00</div>
+            </div> 
+        </div>
+        <div class="buttons">
+            <button class="start-btn" onclick="startStopwatch()">Start</button>
+            <button class="stop-btn" onclick="stopStopwatch()">Stop</button>
+            <button class="reset-btn" onclick="resetStopwatch()">Reset</button>
+            <button class="lap-btn" onclick="recordLap()">Lap</button>
+        </div>
+        <div class="theme-switcher">
+            <button class="theme-btn" onclick="toggleTheme()">Toggle Theme</button>
+        </div>
+        <ul class="laps" id="lapList"></ul>
+    </div>
+    <script>
+        //Stores when the stopwatch starts.
+        let startTime, timerInterval;   //Holds the interval function.
+        //Tracks if the stopwatch is running.
+        let running = false;      
+        //Keeps elapsed time when paused. 
+        let difference = 0;    
+         //Tracks if the display is flipped   
+        let isFlipped = false;
+        // Stores recorded lap times  
+        let laps = [];  
+
+        function updateTime() {
+            let now = new Date().getTime();
+            difference = now - startTime;
+            let hours = Math.floor(difference / (1000 * 60 * 60));
+            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            let timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;  
+            flipDisplay(timeString);  //
+        }
+
+        function flipDisplay(timeString) {
+            let front = document.getElementById("timeFront");  //represents visible side of clock
+            let back = document.getElementById("timeBack");   // flipping side of clock
+            let flipCard = document.getElementById("flipCard");
+            if (isFlipped) {
+                front.innerText = timeString;
+                flipCard.style.transform = "rotateY(0deg)";  
+            } else {
+                back.innerText = timeString;
+                flipCard.style.transform = "rotateY(180deg)";   
+            }
+            isFlipped = !isFlipped;   
+        }
+
+        function startStopwatch() {
+            if (!running) {
+                startTime = new Date().getTime() - difference;
+                timerInterval = setInterval(updateTime, 1000);
+                running = true;
+            }
+        }
+
+        function stopStopwatch() {
+            if (running) {
+                clearInterval(timerInterval);
+                running = false;
+            }
+        }
+
+        function resetStopwatch() {
+            clearInterval(timerInterval);
+            running = false;
+            difference = 0;
+            laps = [];
+            document.getElementById("lapList").innerHTML = "";
+            flipDisplay("00:00:00");
+        }
+
+        function recordLap() {
+            if (running) {
+                let lapTime = document.getElementById("timeFront").innerText;
+                laps.push(lapTime);
+                let lapList = document.getElementById("lapList");     
+                let li = document.createElement("li");
+                li.innerText = `Lap ${laps.length}: ${lapTime}`;
+                lapList.appendChild(li);
+            }
+        }
+
+        function toggleTheme() {      //whole para
+            document.body.classList.toggle("dark-mode");
+            document.body.style.background = document.body.classList.contains("dark-mode") ? "#333" : "linear-gradient(135deg, #00feba, #5b548a)";
+        }
+    </script>
+</body>
+</html>
